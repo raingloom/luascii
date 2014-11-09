@@ -1,8 +1,7 @@
-function inner ()
-	local a="a"
-	return function ()
-		return a
-	end
+--testing randomness goes here
+require"lfs"
+xplore=require"xplore"
+for f in lfs.dir(lfs.currentdir()) do
+	print(("-"):rep(6*4))
+	xplore(lfs.attributes(f))
 end
-a="b"
-print(inner()())

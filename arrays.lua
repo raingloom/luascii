@@ -3,6 +3,7 @@
 ]]
 local class={}
 local serialize=require"pl.pretty".write
+local getter
 
 --[[--Initializer
 	@param y Y size
@@ -45,16 +46,29 @@ function class:__index(i)
 			end
 		end
 	else
+		if ty=="table" then
+			local ok,v=pcall(getter,self,i[1],i[2])
+			if ok then return v end
+		end
 		return class[i]
 	end
 end
+
 
 
 --[[--
 
 ]]
 function class:get (y,x)
+	if type(y)=="table" then y,x=y[1],y[2] end
+	local lx=self.lx
+	if x>=1 and x<=lx and y>=1 and y<=self.ly then
+		return self.a[(y-1)*lx+x]
+	else
+		error(("y=%d,x=%d out of bounds:[1,%d],[1,%d]]"):format(y,x,self.ly,lx))
+	end
 end
+getter=class.get
 
 
 
@@ -110,8 +124,10 @@ end
 
 
 --tests
-object=class.new(5,6,0)
+local object=class.new(5,6,0)
 
-for y,x,v in object:fields() do
-	print(y,x,v)
+for v in require"directions".iNeighbourOffsets() do
+	print(unpack(v))
 end
+
+return class
